@@ -37,7 +37,7 @@ namespace FAD
 
             //services.AddTransient<IFlightRepository>(s => new FlightRepository("DRIVER={SQL Server}; SERVER=localhost; DATABASE=FAD DB; Trusted_Connection=yes"));
 
-            services.AddSingleton<IFlightRepository>(new FlightRepository("DRIVER={SQL Server}; SERVER=localhost; DATABASE=FAD DB; Trusted_Connection=yes"));
+            services.AddSingleton<IFlightRepository>(new FlightRepository(System.Configuration.ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString));
 
             //services.AddTransient<IFlightRepository, FlightRepository>();
             services.AddSingleton<IDeliveryRepository, DeliveryRepository>();

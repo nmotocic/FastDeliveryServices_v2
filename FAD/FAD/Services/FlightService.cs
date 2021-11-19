@@ -13,7 +13,7 @@ namespace FAD.Services
         public FlightService(IOptions<DataConnection> options)
         {
             var connection = options.Value;
-            _repository = new FlightRepository(connection.ConnectionString);
+            _repository = new FlightRepository();
         }
 
         public bool FindAirport(string iata) {

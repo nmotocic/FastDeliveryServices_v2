@@ -2,23 +2,39 @@
 using FAD.Models;
 using System.Data.SqlClient;
 
+
 namespace FAD.Repository
 {
     public class FlightRepository : IFlightRepository
     {
-        private static SqlConnection? _connection = new SqlConnection();
-        public FlightRepository(string connectionString)
+        private static SqlConnection _connection;
+        public static IConfigurationRoot Configuration;
+
+        public FlightRepository()
         {
-            _connection = new SqlConnection("SERVER=localhost");
+            //string connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString;
+            _connection = new SqlConnection(GetConnectionString());
+        }
+
+        private string GetConnectionString()
+        {
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json");
+
+            Configuration = builder.Build();
+            var connectionString = Configuration["MyConnectionString:ConnectionString"];
+            return connectionString;
         }
 
         public List<Flight> GetAll()
         {
+            _connection.Open();
             using (var command = new SqlCommand("SELECT * FROM Flights"))
             {
                 var list = new List<Flight>();
                 command.Connection = _connection;
-                _connection.Open();
+                
                 try
                 {
                     var reader = command.ExecuteReader();
@@ -150,11 +166,11 @@ namespace FAD.Repository
 
         private Flight GetRecord(SqlCommand command)
         {
-            using(var connection = _connection)
-            {
+
+           
                 Flight record = null;
-                command.Connection = connection;
-                connection.Open();
+                command.Connection = _connection;
+                _connection.Open();
                 try
                 {
                     var reader = command.ExecuteReader();
@@ -173,11 +189,11 @@ namespace FAD.Repository
                 }
                 finally
                 {
-                    connection.Close();
+                    _connection.Close();
                 }
 
                 return record;
-            }
+            
             
         }
     } 

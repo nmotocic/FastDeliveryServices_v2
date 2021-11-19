@@ -3,6 +3,7 @@ using FAD.Domain.Repository;
 using FAD.Domain.Services;
 using FAD.Repository;
 using FAD.Services;
+using ConfigurationManager = System.Configuration.ConfigurationManager;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,8 +14,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
-builder.Services.AddSingleton<IFlightRepository>(new FlightRepository("Server=localhost"));
+builder.Services.AddSingleton<IFlightRepository>(new FlightRepository());
 
 builder.Services.AddScoped<IFlightService, FlightService>();
 

@@ -23,23 +23,9 @@ namespace FAD.Controllers
             _flightService = flightService;
         }
 
-        // GET: api/<FlightController>
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
-
-        // GET api/<FlightController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
         // POST api/fad/flights
         [HttpPost]
-        public ActionResult Post([FromBody] Flight flight)
+        public IActionResult Post([FromBody] Flight flight)
         {
             //Check if IATA exists
             var checkIATA = _flightService.FindAirport(flight.From);
@@ -68,16 +54,23 @@ namespace FAD.Controllers
             
         }
 
-        // PUT api/<FlightController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        // DELETE api/fad/flights/from
+        [HttpDelete()]
+        public IActionResult Delete(string from, string to)
         {
-        }
+            // Check if IATA exists
+             var checkIATA = _flightService.FindAirport(from);
+            if (checkIATA)
+            {
+                checkIATA = _flightService.FindAirport(to);
+                if (!checkIATA) return Problem("Unknown IATA airport code");
+            }
+            else
+            {
+                return Problem("Unknown IATA airport code");
+            }
 
-        // DELETE api/<FlightController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+            return Ok();
         }
     }
 }

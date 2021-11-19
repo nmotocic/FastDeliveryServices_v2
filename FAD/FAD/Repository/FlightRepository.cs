@@ -5,27 +5,13 @@ using System.Data.SqlClient;
 
 namespace FAD.Repository
 {
-    public class FlightRepository : IFlightRepository
+    public class FlightRepository : BaseRepository<Flight>, IFlightRepository
     {
-        private static SqlConnection _connection;
-        public static IConfigurationRoot Configuration;
-
         public FlightRepository()
         {
-            //string connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString;
-            _connection = new SqlConnection(GetConnectionString());
+            
         }
 
-        private string GetConnectionString()
-        {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json");
-
-            Configuration = builder.Build();
-            var connectionString = Configuration["MyConnectionString:ConnectionString"];
-            return connectionString;
-        }
 
         public List<Flight> GetAll()
         {
@@ -69,7 +55,6 @@ namespace FAD.Repository
             }
         }
 
-        
 
         //REFACTOR
         public bool FindFlight(Flight flight) {
@@ -105,31 +90,16 @@ namespace FAD.Repository
             }
         }
 
-        //REFACTOR
         public Flight AddFlight(Flight flight) {
             using (var command = new SqlCommand("INSERT INTO Flights (IATAFrom, IATATo) VALUES (@IATAFrom, @IATATo)"))
             {
                 command.Parameters.Add(new SqlParameter("@IATAFrom", flight.From));
                 command.Parameters.Add(new SqlParameter("@IATATo", flight.To));
 
-                AddRecord(command);
+                ExecuteRecord(command);
 
             }
             return flight;
-        }
-
-        private void AddRecord(SqlCommand command)
-        {
-            command.Connection = _connection;
-            _connection.Open();
-            try
-            {
-                command.ExecuteNonQuery();
-            }
-            finally
-            {
-                _connection.Close();
-            }
         }
 
         public void DeleteFlight(Flight flight) {
@@ -137,25 +107,11 @@ namespace FAD.Repository
                 command.Parameters.Add(new SqlParameter("@IATAFrom", flight.From));
                 command.Parameters.Add(new SqlParameter("@IATATo", flight.To));
 
-                RemoveRecord(command);
+                ExecuteRecord(command);
             }
         }
 
-        private void RemoveRecord(SqlCommand command)
-        {
-            command.Connection = _connection;
-            _connection.Open();
-            try
-            {
-                command.ExecuteNonQuery();
-            }
-            finally
-            {
-                _connection.Close();
-            }
-        }
-
-        public Flight PopulateRecord(SqlDataReader reader)
+        public override Flight PopulateRecord(SqlDataReader reader)
         {
             return new Flight
             {
@@ -164,38 +120,7 @@ namespace FAD.Repository
             };
         }
 
-        private Flight GetRecord(SqlCommand command)
-        {
-
-           
-                Flight record = null;
-                command.Connection = _connection;
-                _connection.Open();
-                try
-                {
-                    var reader = command.ExecuteReader();
-                    try
-                    {
-                        while (reader.Read())
-                        {
-                            record = PopulateRecord(reader);
-                            break;
-                        }
-                    }
-                    finally
-                    {
-                        reader.Close();
-                    }
-                }
-                finally
-                {
-                    _connection.Close();
-                }
-
-                return record;
-            
-            
-        }
+        
     } 
 }
 

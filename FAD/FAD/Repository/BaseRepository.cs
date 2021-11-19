@@ -7,11 +7,23 @@ namespace FAD.Repository
 {
     public abstract class BaseRepository<T> where T : class
     {
-        private static SqlConnection _connection;
+        public static SqlConnection _connection;
+        public static IConfigurationRoot Configuration;
 
-        public BaseRepository(string connectionString)
+        public BaseRepository()
         {
-            _connection = new SqlConnection(connectionString);
+            _connection = new SqlConnection(GetConnectionString());
+        }
+
+        private string GetConnectionString()
+        {
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json");
+
+            Configuration = builder.Build();
+            var connectionString = Configuration["MyConnectionString:ConnectionString"];
+            return connectionString;
         }
 
         public virtual T PopulateRecord(SqlDataReader reader)
@@ -77,7 +89,7 @@ namespace FAD.Repository
             return record;
         }
 
-        protected void AddRecord(SqlCommand command) {
+        protected void ExecuteRecord(SqlCommand command) {
             command.Connection = _connection;
             _connection.Open();
             try
@@ -89,18 +101,6 @@ namespace FAD.Repository
             }
         }
 
-        protected void RemoveRecord(SqlCommand command) {
-            command.Connection = _connection;
-            _connection.Open();
-            try
-            {
-                command.ExecuteNonQuery();
-            }
-            finally
-            {
-                _connection.Close();
-            }
-        }
     }
 }
 

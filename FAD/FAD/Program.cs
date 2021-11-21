@@ -15,8 +15,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IFlightRepository>(new FlightRepository());
+builder.Services.AddSingleton<IDeliveryRepository>(new DeliveryRepository());
+builder.Services.AddSingleton<IDeliveryAirportRepository>(new DeliveryAirportRepository());
 
 builder.Services.AddScoped<IFlightService, FlightService>();
+builder.Services.AddScoped<IDeliveryService, DeliveryService>();
 
 var app = builder.Build();
 

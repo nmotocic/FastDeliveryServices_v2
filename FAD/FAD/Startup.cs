@@ -41,8 +41,10 @@ namespace FAD
 
             //services.AddTransient<IFlightRepository, FlightRepository>();
             services.AddSingleton<IDeliveryRepository, DeliveryRepository>();
+            services.AddSingleton<IDeliveryAirportRepository, DeliveryAirportRepository>();
 
             services.AddScoped<IFlightService, FlightService>();
+            services.AddScoped<IDeliveryService, DeliveryService>();
 
 
         }

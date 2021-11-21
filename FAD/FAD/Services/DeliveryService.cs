@@ -27,5 +27,10 @@ namespace FAD.Services
         {
             return _repository.GetByIata(iataFrom, iataTo);
         }
+        public bool FindFlight(string from, string to)
+        {
+            return _repository.FindFlight(from, to);
+        }
+
     }
 }

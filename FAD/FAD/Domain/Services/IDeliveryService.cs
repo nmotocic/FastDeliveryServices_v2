@@ -9,5 +9,6 @@ namespace FAD.Domain.Services
         bool FindAirport(string iata);
 
         Airport GetAirport(string iata);
+        bool FindFlight(string from, string to);
     }
 }

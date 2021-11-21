@@ -2,6 +2,7 @@
 using FAD.Domain.Services;
 using FAD.Models;
 using FAD.Repository;
+using FAD.Resources;
 using FAD.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -32,10 +33,21 @@ namespace FAD.Controllers
             if (checkIATA)
             {
                 checkIATA = _flightService.FindAirport(flight.To);
-                if (!checkIATA) return Problem("Unknown IATA airport code");
+                if (!checkIATA) {
+                    FlightResource message = new FlightResource();
+                    message.Status = "ERROR";
+                    message.Message = "Unknown IATA airport code";
+                    message.NewFlights = 0;
+                    return BadRequest(message);
+                }
+                
             }
             else {
-                return Problem("Unknown IATA airport code");
+                FlightResource message = new FlightResource();
+                message.Status = "ERROR";
+                message.Message = "Unknown IATA airport code";
+                message.NewFlights = 0;
+                return BadRequest("Unknown IATA airport code");
             }
 
             //Check if there's a flight already 
@@ -44,10 +56,15 @@ namespace FAD.Controllers
             if (!exisitingFlight)
             {
                 var addedFlight = _flightService.AddFlight(flight);
-                return Ok("Thank you for using the FAD Services!");
+                FlightResource message = new FlightResource();
+                message.Status = "OK";
+                message.Message = "Thank you for using the FAD Services!";
+                message.NewFlights = 1;
+
+                return Ok(message);
             }
             else {
-                return Ok("Thank you for using the FAD Services!");
+                return Ok();
             } 
             
            
@@ -63,11 +80,11 @@ namespace FAD.Controllers
             if (checkIATA)
             {
                 checkIATA = _flightService.FindAirport(to);
-                if (!checkIATA) return Problem("Unknown IATA airport code");
+                if (!checkIATA) return BadRequest("Unknown IATA airport code");
             }
             else
             {
-                return Problem("Unknown IATA airport code");
+                return BadRequest("Unknown IATA airport code");
             }
 
             return Ok();

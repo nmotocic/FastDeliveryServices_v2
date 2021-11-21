@@ -58,5 +58,22 @@ namespace FAD.Repository
                 return true;
             }
         }
+
+        public bool FindFlight(string from, string to)
+        {
+            using (var command = new SqlCommand("SELECT * FROM Flights WHERE IataFrom = @IATAFrom AND IataTo = @IATATo"))
+            {
+                command.Parameters.Add(new SqlParameter("@IATAFrom", from));
+                command.Parameters.Add(new SqlParameter("@IATATo", to));
+
+                var record = GetRecord(command);
+                if (record == null)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using FAD.Domain.Services;
 using FAD.Models;
+using FAD.Resources;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -30,18 +31,40 @@ namespace FAD.Controllers
             if (checkIATA)
             {
                 checkIATA = _deliveryService.FindAirport(to);
-                if (!checkIATA) return Problem("Unknown IATA airport code");
+                if (!checkIATA) return BadRequest("Unknown IATA airport code");
             }
             else
             {
-                return Problem("Unknown IATA airport code");
+                return BadRequest("Unknown IATA airport code");
             }
 
-            distance = CalculateDistance(_deliveryService.GetAirport(from), _deliveryService.GetAirport(to));
-            price = CalculatePrice(distance, CheckDate(date));
 
+            //Check if the delivery is possible
+            var checkFlight = _deliveryService.FindFlight(from, to);
+            if (checkFlight)
+            {
+                distance = CalculateDistance(_deliveryService.GetAirport(from), _deliveryService.GetAirport(to));
+                price = CalculatePrice(distance, CheckDate(date));
 
-            return Ok();
+                DeliveryResource message = new DeliveryResource();
+                message.Status = "AVAILABLE";
+                message.Message = "Thank you for using FAD services";
+                message.Departure = from;
+                message.Arrival = to;
+                message.TotalPrice = price;
+
+                return Ok(message);
+            }
+            else {
+                DeliveryResource message = new DeliveryResource();
+                message.Status = "UNAVAILABLE";
+                message.Message = "We're unable to fulfill your request :(";
+                message.Departure = from;
+                message.Arrival = to;
+                message.TotalPrice = 0f;
+                return Ok(message);
+            }
+            
         }
 
         private float CalculateDistance(Airport from, Airport to) {

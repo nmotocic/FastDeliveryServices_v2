@@ -55,8 +55,6 @@ namespace FAD.Repository
             }
         }
 
-
-        //REFACTOR
         public bool FindFlight(Flight flight) {
 
 
@@ -74,7 +72,6 @@ namespace FAD.Repository
             }
         }
 
-        //REFACTOR
         public bool FindAirport(string iata) {
             using (var command = new SqlCommand("SELECT * FROM Airports WHERE IATA = @iata"))
             {

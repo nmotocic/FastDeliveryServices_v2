@@ -6,5 +6,6 @@ namespace FAD.Domain.Repository
     {
 
         Flight GetByIata(string iataFrom, string iataTo);
+        bool FindFlight(string from, string to);
     }
 }
